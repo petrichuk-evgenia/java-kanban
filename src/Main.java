@@ -1,9 +1,9 @@
-import ru.practikum.Epic;
-import ru.practikum.Subtask;
-import ru.practikum.Task;
-import ru.practikum.TaskManager;
-import ru.practikum.constants.IssueTypes;
-import ru.practikum.constants.Status;
+import ru.practikum.task.Epic;
+import ru.practikum.task.Subtask;
+import ru.practikum.task.Task;
+import ru.practikum.manager.TaskManager;
+import ru.practikum.task.IssueTypes;
+import ru.practikum.task.Status;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -39,60 +39,60 @@ public class Main {
     private static void test(TaskManager taskManager) {
         System.out.println("Демо:");
         System.out.println("\nДобавление задач:");
-        int t1Id = TaskManager.addIssue(new Task("task1", "task1_desc", taskManager.incTaskIdCounter()));
-        int t2Id = TaskManager.addIssue(new Task("task2", "task2_desc", taskManager.incTaskIdCounter()));
-        int e1Id = TaskManager.addIssue(new Epic("epic1", "epic1_desc", taskManager.incEpicIdCounter()));
-        int e2Id = TaskManager.addIssue(new Epic("epic2", "epic2_desc", taskManager.incEpicIdCounter()));
-        int s1Id = TaskManager.addIssue(new Subtask("subtask1", "subtask1_desc", TaskManager.getIssueById(e1Id, IssueTypes.EPIC).getId(), taskManager.incSubtaskIdCounter()));
-        int s2Id = TaskManager.addIssue(new Subtask("subtask2", "subtask2_desc", TaskManager.getIssueById(e1Id, IssueTypes.EPIC).getId(), taskManager.incSubtaskIdCounter()));
-        int s3Id = TaskManager.addIssue(new Subtask("subtask3", "subtask3_desc", TaskManager.getIssueById(e2Id, IssueTypes.EPIC).getId(), taskManager.incSubtaskIdCounter()));
-        int s4Id = TaskManager.addIssue(new Subtask("subtask4", "subtask4_desc", TaskManager.getIssueById(e2Id, IssueTypes.EPIC).getId(), taskManager.incSubtaskIdCounter()));
-        TaskManager.printAllIssues();
+        int t1Id = taskManager.addIssue(new Task(taskManager.incTaskIdCounter(), "task1", "task1_desc"));
+        int t2Id = taskManager.addIssue(new Task(taskManager.incTaskIdCounter(), "task2", "task2_desc"));
+        int e1Id = taskManager.addIssue(new Epic(taskManager.incEpicIdCounter(),"epic1", "epic1_desc"));
+        int e2Id = taskManager.addIssue(new Epic(taskManager.incEpicIdCounter(), "epic2", "epic2_desc"));
+        int s1Id = taskManager.addIssue(new Subtask(taskManager.incSubtaskIdCounter(), "subtask1", "subtask1_desc", taskManager.getIssueById(e1Id, IssueTypes.EPIC).getId()));
+        int s2Id = taskManager.addIssue(new Subtask(taskManager.incSubtaskIdCounter(), "subtask2", "subtask2_desc", taskManager.getIssueById(e1Id, IssueTypes.EPIC).getId()));
+        int s3Id = taskManager.addIssue(new Subtask(taskManager.incSubtaskIdCounter(), "subtask3", "subtask3_desc", taskManager.getIssueById(e2Id, IssueTypes.EPIC).getId()));
+        int s4Id = taskManager.addIssue(new Subtask(taskManager.incSubtaskIdCounter(), "subtask4", "subtask4_desc", taskManager.getIssueById(e2Id, IssueTypes.EPIC).getId()));
+        taskManager.printAllIssues();
         System.out.println("\nИзменение тасков и эпиков:");
-        TaskManager.updateIssue(t1Id, new Task("task1_upd", "task1_desc_upd", Status.IN_PROGRESS, taskManager.incTaskIdCounter()));
-        TaskManager.updateIssue(t2Id, new Task("task2_upd", "task2_desc_upd", Status.DONE, taskManager.incTaskIdCounter()));
-        TaskManager.updateIssue(e2Id, new Epic("epic2_upd", "epic2_desc_upd", Status.DONE, taskManager.incEpicIdCounter()));
+        taskManager.updateIssue(t1Id, new Task(taskManager.incTaskIdCounter(), "task1_upd", "task1_desc_upd", Status.IN_PROGRESS));
+        taskManager.updateIssue(t2Id, new Task(taskManager.incTaskIdCounter(), "task2_upd", "task2_desc_upd", Status.DONE));
+        taskManager.updateIssue(e2Id, new Epic(taskManager.incEpicIdCounter(), "epic2_upd", "epic2_desc_upd", Status.DONE));
         System.out.println("\nИзменение сабтасков:");
-        TaskManager.updateIssue(s1Id, new Subtask("subtask1_upd", "subtask1_desc_upd", Status.IN_PROGRESS, taskManager.incSubtaskIdCounter()));
-        TaskManager.updateIssue(s2Id, new Subtask("subtask2_upd", "subtask2_desc_upd", Status.DONE, taskManager.incSubtaskIdCounter()));
-        TaskManager.updateIssue(s3Id, new Subtask("subtask3_upd", "subtask3_desc_upd", Status.DONE, taskManager.incSubtaskIdCounter()));
-        TaskManager.updateIssue(s4Id, new Subtask("subtask4_upd", "subtask4_desc_upd", Status.DONE, taskManager.incSubtaskIdCounter()));
-        TaskManager.printAllIssues();
+        taskManager.updateIssue(s1Id, new Subtask(taskManager.incSubtaskIdCounter(), "subtask1_upd", "subtask1_desc_upd", Status.IN_PROGRESS));
+        taskManager.updateIssue(s2Id, new Subtask(taskManager.incSubtaskIdCounter(), "subtask2_upd", "subtask2_desc_upd", Status.DONE));
+        taskManager.updateIssue(s3Id, new Subtask(taskManager.incSubtaskIdCounter(),"subtask3_upd", "subtask3_desc_upd", Status.DONE));
+        taskManager.updateIssue(s4Id, new Subtask(taskManager.incSubtaskIdCounter(),"subtask4_upd", "subtask4_desc_upd", Status.DONE));
+        taskManager.printAllIssues();
         System.out.println("\nПросмотр каждой отдельной задачи:");
-        System.out.println(TaskManager.getIssueById(t1Id, IssueTypes.TASK).toString());
-        System.out.println(TaskManager.getIssueById(t2Id, IssueTypes.TASK).toString());
-        System.out.println(TaskManager.getIssueById(e1Id, IssueTypes.EPIC).toString());
-        System.out.println(TaskManager.getIssueById(e2Id, IssueTypes.EPIC).toString());
-        System.out.println(TaskManager.getIssueById(s1Id, IssueTypes.SUBTASK).toString());
-        System.out.println(TaskManager.getIssueById(s2Id, IssueTypes.SUBTASK).toString());
-        System.out.println(TaskManager.getIssueById(s3Id, IssueTypes.SUBTASK).toString());
-        System.out.println(TaskManager.getIssueById(s4Id, IssueTypes.SUBTASK).toString());
+        System.out.println(taskManager.getIssueById(t1Id, IssueTypes.TASK).toString());
+        System.out.println(taskManager.getIssueById(t2Id, IssueTypes.TASK).toString());
+        System.out.println(taskManager.getIssueById(e1Id, IssueTypes.EPIC).toString());
+        System.out.println(taskManager.getIssueById(e2Id, IssueTypes.EPIC).toString());
+        System.out.println(taskManager.getIssueById(s1Id, IssueTypes.SUBTASK).toString());
+        System.out.println(taskManager.getIssueById(s2Id, IssueTypes.SUBTASK).toString());
+        System.out.println(taskManager.getIssueById(s3Id, IssueTypes.SUBTASK).toString());
+        System.out.println(taskManager.getIssueById(s4Id, IssueTypes.SUBTASK).toString());
         System.out.println("\nУдаление:");
-        TaskManager.removeIssueById(t2Id, IssueTypes.TASK);
-        TaskManager.removeIssueById(s1Id, IssueTypes.SUBTASK);
-        TaskManager.removeIssueById(e2Id, IssueTypes.EPIC);
-        TaskManager.printAllIssues();
+        taskManager.removeIssueById(t2Id, IssueTypes.TASK);
+        taskManager.removeIssueById(s1Id, IssueTypes.SUBTASK);
+        taskManager.removeIssueById(e2Id, IssueTypes.EPIC);
+        taskManager.printAllIssues();
         System.out.println("\nОчистка списка задач: Task");
-        TaskManager.clearIssuesList(IssueTypes.TASK);
-        TaskManager.printAllIssues();
+        taskManager.clearIssuesList(IssueTypes.TASK);
+        taskManager.printAllIssues();
         System.out.println("\nОчистка списка задач: Subtask");
-        TaskManager.clearIssuesList(IssueTypes.SUBTASK);
-        TaskManager.printAllIssues();
+        taskManager.clearIssuesList(IssueTypes.SUBTASK);
+        taskManager.printAllIssues();
         System.out.println("\nОчистка списка задач: Epic без сабтасков");
-        TaskManager.clearIssuesList(IssueTypes.EPIC);
-        TaskManager.printAllIssues();
+        taskManager.clearIssuesList(IssueTypes.EPIC);
+        taskManager.printAllIssues();
         System.out.println("\nОчистка списка задач: Epic c сабтасками");
-        int e1Id_new = TaskManager.addIssue(new Epic("epic1", "epic1_desc", taskManager.incEpicIdCounter()));
-        int e2Id_new = TaskManager.addIssue(new Epic("epic2", "epic2_desc", taskManager.incEpicIdCounter()));
-        TaskManager.addIssue(new Subtask("subtask1", "subtask1_desc", TaskManager.getIssueById(e1Id_new, IssueTypes.EPIC).getId(), taskManager.incSubtaskIdCounter()));
-        TaskManager.addIssue(new Subtask("subtask2", "subtask2_desc", TaskManager.getIssueById(e1Id_new, IssueTypes.EPIC).getId(), taskManager.incSubtaskIdCounter()));
-        TaskManager.addIssue(new Subtask("subtask3", "subtask3_desc", TaskManager.getIssueById(e2Id_new, IssueTypes.EPIC).getId(), taskManager.incSubtaskIdCounter()));
-        TaskManager.addIssue(new Subtask("subtask4", "subtask4_desc", TaskManager.getIssueById(e2Id_new, IssueTypes.EPIC).getId(), taskManager.incSubtaskIdCounter()));
+        int e1Id_new =taskManager.addIssue(new Epic(taskManager.incEpicIdCounter(), "epic1", "epic1_desc"));
+        int e2Id_new = taskManager.addIssue(new Epic(taskManager.incEpicIdCounter(), "epic2", "epic2_desc"));
+        taskManager.addIssue(new Subtask(taskManager.incSubtaskIdCounter(), "subtask1", "subtask1_desc", taskManager.getIssueById(e1Id_new, IssueTypes.EPIC).getId()));
+        taskManager.addIssue(new Subtask(taskManager.incSubtaskIdCounter(),"subtask2", "subtask2_desc", taskManager.getIssueById(e1Id_new, IssueTypes.EPIC).getId()));
+        taskManager.addIssue(new Subtask(taskManager.incSubtaskIdCounter(),"subtask3", "subtask3_desc", taskManager.getIssueById(e2Id_new, IssueTypes.EPIC).getId()));
+        taskManager.addIssue(new Subtask(taskManager.incSubtaskIdCounter(),"subtask4", "subtask4_desc", taskManager.getIssueById(e2Id_new, IssueTypes.EPIC).getId()));
         System.out.println("\nДо очистки:");
-        TaskManager.printAllIssues();
-        TaskManager.clearIssuesList(IssueTypes.EPIC);
+        taskManager.printAllIssues();
+        taskManager.clearIssuesList(IssueTypes.EPIC);
         System.out.println("\nПосле очистки:");
-        TaskManager.printAllIssues();
+        taskManager.printAllIssues();
     }
 
     private static void handMenuChoice(TaskManager taskManager) {
@@ -104,12 +104,12 @@ public class Main {
                 scanner.nextLine();
                 switch (choice) {
                     case 1 -> addIssue(taskManager);
-                    case 2 -> printIssue();
+                    case 2 -> printIssue(taskManager);
                     case 3 -> updateIssue(taskManager);
-                    case 4 -> removeIssue();
-                    case 5 -> TaskManager.printIssues(chooseIssueType());
-                    case 6 -> TaskManager.printAllIssues();
-                    case 7 -> TaskManager.clearIssuesList(chooseIssueType());
+                    case 4 -> removeIssue(taskManager);
+                    case 5 -> taskManager.printIssues(chooseIssueType());
+                    case 6 -> taskManager.printAllIssues();
+                    case 7 -> taskManager.clearIssuesList(chooseIssueType());
                     case 8 -> {
                         System.out.println("Работа завершена");
                         return;
@@ -201,13 +201,13 @@ public class Main {
         int id = 0;
         switch (type) {
             case TASK -> {
-                id = TaskManager.addIssue(new Task(summary, description, taskManager.incTaskIdCounter()));
+                id = taskManager.addIssue(new Task(taskManager.incTaskIdCounter(), summary, description));
             }
             case EPIC -> {
-                id = TaskManager.addIssue(new Epic(summary, description, taskManager.incEpicIdCounter()));
+                id = taskManager.addIssue(new Epic(taskManager.incEpicIdCounter(), summary, description));
             }
             case SUBTASK -> {
-                if (TaskManager.getIssuesList(IssueTypes.EPIC, Epic.class).size() == 0) {
+                if (taskManager.getIssuesList(IssueTypes.EPIC, Epic.class).size() == 0) {
                     System.out.println("Нет эпиков. Добавьте эпик");
                     return;
                 }
@@ -215,18 +215,18 @@ public class Main {
                 System.out.println("Введите ID родительского эпика:");
                 epicId = scanner.nextInt();
                 scanner.nextLine();
-                id = TaskManager.addIssue(new Subtask(summary, description, TaskManager.getIssueById(epicId, IssueTypes.EPIC).getId(), taskManager.incSubtaskIdCounter()));
+                id = taskManager.addIssue(new Subtask(taskManager.incSubtaskIdCounter(), summary, description, taskManager.getIssueById(epicId, IssueTypes.EPIC).getId()));
             }
         }
         System.out.println("Задача добавлена. ID: " + id);
     }
 
-    private static void printIssue() {
+    private static void printIssue(TaskManager taskManager) {
         IssueTypes type = chooseIssueType();
         System.out.println("Введите ID задачи, которую хотите посмотреть:");
         int id = scanner.nextInt();
         scanner.nextLine();
-        System.out.println(TaskManager.getIssueById(id, type).toString());
+        System.out.println(taskManager.getIssueById(id, type).toString());
     }
 
     private static void updateIssue(TaskManager taskManager) {
@@ -236,7 +236,7 @@ public class Main {
         scanner.nextLine();
         try {
             //проверка на существование задачи
-            TaskManager.getIssueById(id, type);
+            taskManager.getIssueById(id, type);
             System.out.println("Введите новое название задачи:");
             String summary = scanner.nextLine();
             System.out.println("Введите новое описание задачи:");
@@ -244,22 +244,22 @@ public class Main {
             Status newStatus = chooseStatusType();
 
             switch (type) {
-                case TASK -> TaskManager.updateIssue(id, new Task(summary, description, newStatus, taskManager.incTaskIdCounter()));
-                case EPIC -> TaskManager.updateIssue(id, new Epic(summary, description, newStatus, taskManager.incEpicIdCounter()));
-                case SUBTASK -> TaskManager.updateIssue(id, new Subtask(summary, description, newStatus, taskManager.incSubtaskIdCounter()));
+                case TASK -> taskManager.updateIssue(id, new Task(taskManager.incTaskIdCounter(), summary, description, newStatus));
+                case EPIC -> taskManager.updateIssue(id, new Epic(taskManager.incEpicIdCounter(), summary, description, newStatus));
+                case SUBTASK -> taskManager.updateIssue(id, new Subtask(taskManager.incSubtaskIdCounter(), summary, description, newStatus));
             }
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    private static void removeIssue() {
+    private static void removeIssue(TaskManager taskManager) {
         IssueTypes type = chooseIssueType();
         System.out.println("Введите ID задачи, которую хотите удалить:");
         int id = scanner.nextInt();
         scanner.nextLine();
         try {
-            TaskManager.removeIssueById(id, type);
+            taskManager.removeIssueById(id, type);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }

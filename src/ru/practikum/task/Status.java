@@ -1,4 +1,4 @@
-package ru.practikum.constants;
+package ru.practikum.task;
 
 public enum Status {
 

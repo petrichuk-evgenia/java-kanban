@@ -1,21 +1,19 @@
-package ru.practikum;
-
-import ru.practikum.constants.Status;
+package ru.practikum.task;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
 
-    public List<Integer> subtasks;
+    private final List<Integer> subtasks;
 
-    public Epic(String summary, String description, int id) {
-        super(summary, description, id);
+    public Epic(int id, String summary, String description) {
+        super(id, summary, description);
         this.subtasks = new ArrayList<>();
     }
 
-    public Epic(String summary, String description, Status status, int id) {
-        super(summary, description, status, id);
+    public Epic(int id, String summary, String description, Status status) {
+        super(id, summary, description, status);
         this.subtasks = new ArrayList<>();
     }
 
@@ -28,7 +26,7 @@ public class Epic extends Task {
     public String toString() {
         return "Epic{" +
                 "subtaskIds=" + subtasks.toString() +
-                ", id='" + id + '\'' +
+                ", id='" + super.getId() + '\'' +
                 ", summary='" + summary + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +

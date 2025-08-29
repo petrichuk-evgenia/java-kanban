@@ -1,17 +1,19 @@
-package ru.practikum;
+package ru.practikum.manager;
 
-import ru.practikum.constants.IssueTypes;
-import ru.practikum.constants.Status;
+import ru.practikum.task.IssueTypes;
+import ru.practikum.task.Status;
+import ru.practikum.task.Epic;
+import ru.practikum.task.Subtask;
+import ru.practikum.task.Task;
 
 import java.util.*;
 
-import static ru.practikum.constants.IssueTypes.*;
-
+import static ru.practikum.task.IssueTypes.*;
 
 public class TaskManager {
 
     //список задач
-    private static Map<IssueTypes, List<Object>> tasksList;
+    private Map<IssueTypes, List<Object>> tasksList;
     private int taskIdCounter;
     private int subtaskIdCounter;
     private int epicIdCounter;
@@ -34,13 +36,13 @@ public class TaskManager {
      * @param issue Задача, которую необходимо добавить
      * @return Идентификатор добавленной задачи
      */
-    public static <T extends Task> int addIssue(T issue) {
+    public <T extends Task> int addIssue(T issue) {
         Class<?> issueClass = issue.getClass();
         switch (issueClass.getSimpleName()) {
             case "Task" -> tasksList.get(TASK).add(issue);
             case "Subtask" -> {
                 tasksList.get(SUBTASK).add(issue);
-                getIssueByClass(Subtask.class.cast(issue).getParentEpicId(), Epic.class).getSubtasks().add(issue.getId());
+                getIssueByClass(Subtask.class.cast(issue).getEpicId(), Epic.class).getSubtasks().add(issue.getId());
             }
             case "Epic" -> tasksList.get(EPIC).add(issue);
         }
@@ -59,14 +61,14 @@ public class TaskManager {
      * @return обновлённую задачу
      * @throws IllegalArgumentException если задача с указанным id не найдена
      */
-    public static <T extends Task> T updateIssue(int id, T issue) {
+    public <T extends Task> T updateIssue(int id, T issue) {
         T updatedIssue = getIssueById(id, IssueTypes.valueOf(issue.getClass().getSimpleName().toUpperCase(Locale.ROOT)));
         updatedIssue.setDescription(issue.getDescription());
         updatedIssue.setSummary(issue.getSummary());
         switch (updatedIssue.getClass().getSimpleName()) {
             case "Subtask" -> {
                 updatedIssue.setStatus(issue.getStatus());
-                updateEpicStatus(Subtask.class.cast(updatedIssue).getParentEpicId());
+                updateEpicStatus(Subtask.class.cast(updatedIssue).getEpicId());
             }
             case "Epic" -> {
                 return updatedIssue;
@@ -91,7 +93,7 @@ public class TaskManager {
      *
      * @param id идентификатор эпика, для которого нужно обновить статус
      */
-    private static void updateEpicStatus(int id) {
+    private void updateEpicStatus(int id) {
         Epic issue = getIssueByClass(id, Epic.class);
         if (issue.getSubtasks().isEmpty()) {
             issue.setStatus(Status.NEW);
@@ -126,7 +128,7 @@ public class TaskManager {
      * @param issueType Тип задач, которые нужно получить (TASK, SUBTASK, EPIC).
      * @return Список задач заданного типа.
      */
-    public static <T extends Task> List<T> getIssuesList(IssueTypes issueType, Class<T> type) {
+    public <T extends Task> List<T> getIssuesList(IssueTypes issueType, Class<T> type) {
         List<T> list = new ArrayList<>();
         tasksList.get(issueType).forEach(issue -> {
             list.add(type.cast(issue));
@@ -139,7 +141,7 @@ public class TaskManager {
      *
      * @param issueType Тип задач, чей список нужно очистить (TASK, SUBTASK, EPIC).
      */
-    public static void clearIssuesList(IssueTypes issueType) {
+    public void clearIssuesList(IssueTypes issueType) {
         if (issueType == IssueTypes.SUBTASK) {
             for (int i = 0; i < tasksList.get(EPIC).size(); i++) {
                 Epic epic = Epic.class.cast(tasksList.get(EPIC).get(i));
@@ -162,7 +164,7 @@ public class TaskManager {
      * @param id  Идентификатор задачи
      * @return Найденная задача типа T или null, если задача не найдена
      */
-    public static <T extends Task> T getIssueById(int id, IssueTypes issueType) {
+    public <T extends Task> T getIssueById(int id, IssueTypes issueType) {
         switch (issueType) {
             case TASK -> {
                 return (T) getIssueByClass(id, Task.class);
@@ -186,7 +188,7 @@ public class TaskManager {
      * @param type Класс типа T, используемый для параметризации
      * @return Найденный элемент типа T или null, если элемент не найден
      */
-    private static <T extends Task> T getIssueByClass(int id, Class<T> type) {
+    private <T extends Task> T getIssueByClass(int id, Class<T> type) {
         T issue = null;
 
         for (T i : getIssuesList(IssueTypes.valueOf(type.getSimpleName().toUpperCase(Locale.ROOT)), type)) {
@@ -205,7 +207,7 @@ public class TaskManager {
      *
      * @param issueType Тип задач, которые необходимо вывести (TASK, SUBTASK, EPIC).
      */
-    public static void printIssues(IssueTypes issueType) {
+    public void printIssues(IssueTypes issueType) {
         for (Object issue : tasksList.get(issueType)) {
             switch (issueType) {
                 case TASK -> printIssue((Task) issue);
@@ -220,7 +222,7 @@ public class TaskManager {
      * Выводит информацию обо всех задачах, перебирая все типы задач.
      * Для каждого типа задач вызывается метод printIssues().
      */
-    public static void printAllIssues() {
+    public void printAllIssues() {
         for (IssueTypes issueType : IssueTypes.values()) {
             printIssues(issueType);
         }
@@ -246,9 +248,9 @@ public class TaskManager {
      * @param issueType тип задачи (TASK, SUBTASK, EPIC)
      * @throws IllegalArgumentException если задача с указанным id не найдена
      */
-    public static void removeIssueById(int id, IssueTypes issueType) {
+    public void removeIssueById(int id, IssueTypes issueType) {
         if (issueType == IssueTypes.SUBTASK) {
-            int parentId = Subtask.class.cast(getIssueById(id, issueType)).getParentEpicId();
+            int parentId = Subtask.class.cast(getIssueById(id, issueType)).getEpicId();
             getIssueByClass(parentId, Epic.class).getSubtasks().removeIf(i -> i == id);
             updateEpicStatus(parentId);
         }
@@ -260,7 +262,7 @@ public class TaskManager {
         removeIssue(id, issueType);
     }
 
-    private static void removeIssue(int id, IssueTypes issueType) {
+    private void removeIssue(int id, IssueTypes issueType) {
         tasksList.get(issueType).removeIf(issue -> {
             if (issue instanceof Task) {
                 return ((Task) issue).getId() == id;

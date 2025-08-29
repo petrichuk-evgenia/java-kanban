@@ -1,4 +1,4 @@
-package ru.practikum.constants;
+package ru.practikum.task;
 
 public enum IssueTypes {
     TASK("Task"),
@@ -9,10 +9,5 @@ public enum IssueTypes {
 
     IssueTypes(String issueType) {
         this.issueType = issueType;
-    }
-
-
-    public String getIssueType() {
-        return issueType;
     }
 }

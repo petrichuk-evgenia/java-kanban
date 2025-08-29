@@ -1,22 +1,20 @@
-package ru.practikum;
-
-import ru.practikum.constants.Status;
+package ru.practikum.task;
 
 public class Task {
 
-    protected int id = 0;
+    private int id;
     protected String summary;
     protected String description;
     protected Status status;
 
-    public Task(String summary, String description, int id) {
+    public Task(int id, String summary, String description) {
         this.id = id;
         this.summary = summary;
         this.description = description;
         this.status = Status.NEW;
     }
 
-    public Task(String summary, String description, Status status, int id) {
+    public Task(int id, String summary, String description, Status status) {
         this.id = id;
         this.summary = summary;
         this.description = description;
@@ -59,5 +57,9 @@ public class Task {
                 ", description='" + description + '\'' +
                 ", status=" + status +
                 '}';
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }
