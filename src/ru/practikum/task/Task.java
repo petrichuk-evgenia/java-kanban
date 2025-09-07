@@ -2,20 +2,20 @@ package ru.practikum.task;
 
 public class Task {
 
-    private int id;
     protected String summary;
     protected String description;
     protected Status status;
+    private int id;
 
-    public Task(int id, String summary, String description) {
-        this.id = id;
+    public Task(String summary, String description) {
+        this.id = 0;
         this.summary = summary;
         this.description = description;
         this.status = Status.NEW;
     }
 
-    public Task(int id, String summary, String description, Status status) {
-        this.id = id;
+    public Task(String summary, String description, Status status) {
+        this.id = 0;
         this.summary = summary;
         this.description = description;
         this.status = status;
@@ -23,6 +23,10 @@ public class Task {
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getSummary() {
@@ -57,9 +61,5 @@ public class Task {
                 ", description='" + description + '\'' +
                 ", status=" + status +
                 '}';
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 }

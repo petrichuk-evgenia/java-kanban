@@ -1,19 +1,19 @@
 package ru.practikum.manager;
 
-import ru.practikum.task.IssueTypes;
-import ru.practikum.task.Status;
 import ru.practikum.task.Epic;
+import ru.practikum.task.Status;
 import ru.practikum.task.Subtask;
 import ru.practikum.task.Task;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
-import static ru.practikum.task.IssueTypes.*;
-
-public class TaskManager {
+public class TaskManager<T extends Task> {
 
     //список задач
-    private Map<IssueTypes, List<Object>> tasksList;
+    private Map<String, List<Object>> tasksList;
     private int taskIdCounter;
     private int subtaskIdCounter;
     private int epicIdCounter;
@@ -24,29 +24,53 @@ public class TaskManager {
         subtaskIdCounter = 0;
         epicIdCounter = 0;
         tasksList = new LinkedHashMap<>();
-        tasksList.put(TASK, new ArrayList<>());
-        tasksList.put(SUBTASK, new ArrayList<>());
-        tasksList.put(EPIC, new ArrayList<>());
+        tasksList.put(Task.class.getSimpleName(), new ArrayList<>());
+        tasksList.put(Subtask.class.getSimpleName(), new ArrayList<>());
+        tasksList.put(Epic.class.getSimpleName(), new ArrayList<>());
+    }
+
+    /**
+     * Вспомогательный метод для вывода информации о конкретной задаче.
+     *
+     * @param issue Объект задачи, который нужно вывести.
+     * @param <T>   Тип задачи, должен быть подклассом {@link Task}.
+     */
+    private static <T extends Task> void printIssue(T issue) {
+        System.out.println(issue.toString());
     }
 
     /**
      * Добавляет задачу в соответствующий список в зависимости от её типа.
      *
-     * @param <T>   Тип задачи, расширяющий класс Task
      * @param issue Задача, которую необходимо добавить
      * @return Идентификатор добавленной задачи
      */
     public <T extends Task> int addIssue(T issue) {
-        Class<?> issueClass = issue.getClass();
-        switch (issueClass.getSimpleName()) {
-            case "Task" -> tasksList.get(TASK).add(issue);
-            case "Subtask" -> {
-                tasksList.get(SUBTASK).add(issue);
-                getIssueByClass(Subtask.class.cast(issue).getEpicId(), Epic.class).getSubtasks().add(issue.getId());
+        String issueType = issue.getClass().getSimpleName();
+        switch (issueType) {
+            case "Task" -> {
+                updateId(issue, incTaskIdCounter());
+                tasksList.get(issueType).add(issue);
             }
-            case "Epic" -> tasksList.get(EPIC).add(issue);
+            case "Subtask" -> {
+                updateId(issue, incSubtaskIdCounter());
+                tasksList.get(issueType).add(issue);
+                Epic parentEpic = getIssueByClass(Subtask.class.cast(issue).getEpicId(), Epic.class);
+                parentEpic.getSubtasks().add(issue.getId());
+                updateEpicStatus(parentEpic.getId());
+            }
+            case "Epic" -> {
+                updateId(issue, incEpicIdCounter());
+                tasksList.get(issueType).add(issue);
+            }
         }
         return issue.getId();
+    }
+
+    private <T extends Task> void updateId(T issue, int id) {
+        if (issue.getId() == 0) {
+            issue.setId(id);
+        }
     }
 
     /**
@@ -62,7 +86,7 @@ public class TaskManager {
      * @throws IllegalArgumentException если задача с указанным id не найдена
      */
     public <T extends Task> T updateIssue(int id, T issue) {
-        T updatedIssue = getIssueById(id, IssueTypes.valueOf(issue.getClass().getSimpleName().toUpperCase(Locale.ROOT)));
+        T updatedIssue = getIssueById(id, issue.getClass().getSimpleName());
         updatedIssue.setDescription(issue.getDescription());
         updatedIssue.setSummary(issue.getSummary());
         switch (updatedIssue.getClass().getSimpleName()) {
@@ -128,7 +152,7 @@ public class TaskManager {
      * @param issueType Тип задач, которые нужно получить (TASK, SUBTASK, EPIC).
      * @return Список задач заданного типа.
      */
-    public <T extends Task> List<T> getIssuesList(IssueTypes issueType, Class<T> type) {
+    public <T extends Task> List<T> getIssuesList(String issueType, Class<T> type) {
         List<T> list = new ArrayList<>();
         tasksList.get(issueType).forEach(issue -> {
             list.add(type.cast(issue));
@@ -141,20 +165,19 @@ public class TaskManager {
      *
      * @param issueType Тип задач, чей список нужно очистить (TASK, SUBTASK, EPIC).
      */
-    public void clearIssuesList(IssueTypes issueType) {
-        if (issueType == IssueTypes.SUBTASK) {
-            for (int i = 0; i < tasksList.get(EPIC).size(); i++) {
-                Epic epic = Epic.class.cast(tasksList.get(EPIC).get(i));
+    public void clearIssuesList(String issueType) {
+        if (issueType.equals("Subtask")) {
+            for (int i = 0; i < tasksList.get("Epic").size(); i++) {
+                Epic epic = Epic.class.cast(tasksList.get("Epic").get(i));
                 epic.getSubtasks().clear();
                 updateEpicStatus(epic.getId());
             }
         }
-        if (issueType == IssueTypes.EPIC) {
-            tasksList.get(SUBTASK).clear();
+        if (issueType.equals("Epic")) {
+            tasksList.get("Subtask").clear();
         }
         tasksList.get(issueType).clear();
     }
-
 
     /**
      * Возвращает задачу по её идентификатору. Если идентификатор соответствует типу TASK,
@@ -164,21 +187,20 @@ public class TaskManager {
      * @param id  Идентификатор задачи
      * @return Найденная задача типа T или null, если задача не найдена
      */
-    public <T extends Task> T getIssueById(int id, IssueTypes issueType) {
+    public <T extends Task> T getIssueById(int id, String issueType) {
         switch (issueType) {
-            case TASK -> {
+            case "Task" -> {
                 return (T) getIssueByClass(id, Task.class);
             }
-            case EPIC -> {
+            case "Epic" -> {
                 return (T) getIssueByClass(id, Epic.class);
             }
-            case SUBTASK -> {
+            case "Subtask" -> {
                 return (T) getIssueByClass(id, Subtask.class);
             }
         }
         return null;
     }
-
 
     /**
      * Возвращает элемент по его идентификатору из списка, полученного через {@code getIssuesList}.
@@ -191,7 +213,7 @@ public class TaskManager {
     private <T extends Task> T getIssueByClass(int id, Class<T> type) {
         T issue = null;
 
-        for (T i : getIssuesList(IssueTypes.valueOf(type.getSimpleName().toUpperCase(Locale.ROOT)), type)) {
+        for (T i : getIssuesList(type.getSimpleName(), type)) {
             if (i.getId() == id) {
                 issue = i;
             }
@@ -207,12 +229,12 @@ public class TaskManager {
      *
      * @param issueType Тип задач, которые необходимо вывести (TASK, SUBTASK, EPIC).
      */
-    public void printIssues(IssueTypes issueType) {
+    public void printIssues(String issueType) {
         for (Object issue : tasksList.get(issueType)) {
             switch (issueType) {
-                case TASK -> printIssue((Task) issue);
-                case SUBTASK -> printIssue((Subtask) issue);
-                case EPIC -> printIssue((Epic) issue);
+                case "Task" -> printIssue((Task) issue);
+                case "Subtask" -> printIssue((Subtask) issue);
+                case "Epic" -> printIssue((Epic) issue);
             }
 
         }
@@ -223,19 +245,9 @@ public class TaskManager {
      * Для каждого типа задач вызывается метод printIssues().
      */
     public void printAllIssues() {
-        for (IssueTypes issueType : IssueTypes.values()) {
-            printIssues(issueType);
-        }
-    }
-
-    /**
-     * Вспомогательный метод для вывода информации о конкретной задаче.
-     *
-     * @param issue Объект задачи, который нужно вывести.
-     * @param <T>   Тип задачи, должен быть подклассом {@link Task}.
-     */
-    private static <T extends Task> void printIssue(T issue) {
-        System.out.println(issue.toString());
+        printIssues("Task");
+        printIssues("Subtask");
+        printIssues("Epic");
     }
 
     /**
@@ -248,21 +260,21 @@ public class TaskManager {
      * @param issueType тип задачи (TASK, SUBTASK, EPIC)
      * @throws IllegalArgumentException если задача с указанным id не найдена
      */
-    public void removeIssueById(int id, IssueTypes issueType) {
-        if (issueType == IssueTypes.SUBTASK) {
+    public void removeIssueById(int id, String issueType) {
+        if (issueType.equals("Subtask")) {
             int parentId = Subtask.class.cast(getIssueById(id, issueType)).getEpicId();
             getIssueByClass(parentId, Epic.class).getSubtasks().removeIf(i -> i == id);
             updateEpicStatus(parentId);
         }
-        if (issueType == IssueTypes.EPIC) {
+        if (issueType.equals("Epic")) {
             for (int subtaskId : getIssueByClass(id, Epic.class).getSubtasks()) {
-                removeIssue(subtaskId, IssueTypes.SUBTASK);
+                removeIssue(subtaskId, "Subtask");
             }
         }
         removeIssue(id, issueType);
     }
 
-    private void removeIssue(int id, IssueTypes issueType) {
+    private void removeIssue(int id, String issueType) {
         tasksList.get(issueType).removeIf(issue -> {
             if (issue instanceof Task) {
                 return ((Task) issue).getId() == id;
