@@ -3,9 +3,13 @@ import ru.practikum.task.Epic;
 import ru.practikum.task.Status;
 import ru.practikum.task.Subtask;
 import ru.practikum.task.Task;
+import ru.practikum.utils.Managers;
 
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
+
+import static ru.practikum.manager.InMemoryTaskManager.printIssue;
 
 public class Main {
 
@@ -13,10 +17,10 @@ public class Main {
 
 
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
+        TaskManager inMemoryTaskManager = Managers.getDefault();
         try {
-            //test(taskManager);
-            handMenuChoice(taskManager);
+            test(inMemoryTaskManager);
+            //handMenuChoice(inMemoryTaskManager);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
@@ -32,6 +36,7 @@ public class Main {
      * 5. Удаляет некоторые задачи.
      * 6. Очищает списки задач (Task, Subtask, Epic).
      * 7. Повторно добавляет эпики с подзадачами и снова очищает список Epic.
+     * 8. Демонстрирует историю просмотров задач
      *
      * @param taskManager экземпляр класса TaskManager, используемый для выполнения операций
      */
@@ -50,7 +55,7 @@ public class Main {
         System.out.println("\nИзменение тасков и эпиков:");
         taskManager.updateIssue(t1Id, new Task("task1_upd", "task1_desc_upd", Status.IN_PROGRESS));
         taskManager.updateIssue(t2Id, new Task("task2_upd", "task2_desc_upd", Status.DONE));
-        taskManager.updateIssue(e2Id, new Epic("epic2_upd", "epic2_desc_upd", Status.DONE));
+        taskManager.updateIssue(e2Id, new Epic("epic2_upd", "epic2_desc_upd"));
         System.out.println("\nИзменение сабтасков:");
         taskManager.updateIssue(s1Id, new Subtask("subtask1_upd", "subtask1_desc_upd", Status.IN_PROGRESS));
         taskManager.updateIssue(s2Id, new Subtask("subtask2_upd", "subtask2_desc_upd", Status.DONE));
@@ -92,6 +97,8 @@ public class Main {
         taskManager.clearIssuesList("Epic");
         System.out.println("\nПосле очистки:");
         taskManager.printAllIssues();
+        System.out.println("\nИстория просмотров:");
+        printHistory(taskManager.getHistoryManager().getHistory());
     }
 
     private static void handMenuChoice(TaskManager taskManager) {
@@ -103,13 +110,14 @@ public class Main {
                 scanner.nextLine();
                 switch (choice) {
                     case 1 -> addIssue(taskManager);
-                    case 2 -> printIssue(taskManager);
+                    case 2 -> printIssueByManager(taskManager);
                     case 3 -> updateIssue(taskManager);
                     case 4 -> removeIssue(taskManager);
                     case 5 -> taskManager.printIssues(chooseIssueType());
                     case 6 -> taskManager.printAllIssues();
                     case 7 -> taskManager.clearIssuesList(chooseIssueType());
-                    case 8 -> {
+                    case 8 -> printHistory(taskManager.getHistoryManager().getHistory());
+                    case 9 -> {
                         System.out.println("Работа завершена");
                         return;
                     }
@@ -136,7 +144,8 @@ public class Main {
         System.out.println("5. Посмотреть список задач по выбранному типу");
         System.out.println("6. Посмотреть список задач всех типов");
         System.out.println("7. Очистить список задач");
-        System.out.println("8. Выход");
+        System.out.println("8. История просмотров задач");
+        System.out.println("9. Выход");
     }
 
     private static String chooseIssueType() {
@@ -220,7 +229,7 @@ public class Main {
         System.out.println("Задача добавлена. ID: " + id);
     }
 
-    private static void printIssue(TaskManager taskManager) {
+    private static void printIssueByManager(TaskManager taskManager) {
         String type = chooseIssueType();
         System.out.println("Введите ID задачи, которую хотите посмотреть:");
         int id = scanner.nextInt();
@@ -244,7 +253,7 @@ public class Main {
 
             switch (type) {
                 case "Task" -> taskManager.updateIssue(id, new Task(summary, description, newStatus));
-                case "Epic" -> taskManager.updateIssue(id, new Epic(summary, description, newStatus));
+                case "Epic" -> taskManager.updateIssue(id, new Epic(summary, description));
                 case "Subtask" -> taskManager.updateIssue(id, new Subtask(summary, description, newStatus));
             }
         } catch (IllegalArgumentException e) {
@@ -262,5 +271,16 @@ public class Main {
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    public static void printHistory(List<Object> history) {
+        history.forEach(issue -> {
+            String issueType = issue.getClass().getSimpleName();
+            switch (issueType) {
+                case "Task" -> printIssue((Task) issue);
+                case "Subtask" -> printIssue((Subtask) issue);
+                case "Epic" -> printIssue((Task) issue);
+            }
+        });
     }
 }

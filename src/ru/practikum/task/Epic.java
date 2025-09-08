@@ -12,12 +12,6 @@ public class Epic extends Task {
         this.subtasks = new ArrayList<>();
     }
 
-    public Epic(String summary, String description, Status status) {
-        super(summary, description, status);
-        this.subtasks = new ArrayList<>();
-    }
-
-
     public List<Integer> getSubtasks() {
         return subtasks;
     }
@@ -31,5 +25,14 @@ public class Epic extends Task {
                 ", description='" + description + '\'' +
                 ", status=" + status +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Epic epic = (Epic) o;
+        return subtasks.equals(epic.subtasks);
     }
 }
