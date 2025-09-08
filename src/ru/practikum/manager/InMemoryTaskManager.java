@@ -294,6 +294,11 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager {
         removeIssue(id, issueType);
     }
 
+    @Override
+    public List<Object> getHistory() {
+        return historyManager.getHistory();
+    }
+
     private void removeIssue(int id, String issueType) {
         tasksList.get(issueType).removeIf(issue -> {
             if (issue instanceof Task) {
@@ -306,17 +311,17 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager {
         });
     }
 
-    public int incTaskIdCounter() {
+    private int incTaskIdCounter() {
         this.taskIdCounter++;
         return this.taskIdCounter;
     }
 
-    public int incSubtaskIdCounter() {
+    private int incSubtaskIdCounter() {
         this.subtaskIdCounter++;
         return this.subtaskIdCounter;
     }
 
-    public int incEpicIdCounter() {
+    private int incEpicIdCounter() {
         this.epicIdCounter++;
         return this.epicIdCounter;
     }

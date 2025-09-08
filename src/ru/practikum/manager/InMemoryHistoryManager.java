@@ -7,7 +7,7 @@ import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private List<Object> history = new ArrayList<>();
+    private final List<Object> history = new ArrayList<>();
 
     /**
      * Добавляет указанную задачу в историю просмотров.
@@ -19,10 +19,12 @@ public class InMemoryHistoryManager implements HistoryManager {
      */
     @Override
     public <T extends Task> void addToHistory(T issue) {
-        if (history.size() == 10) {
-            history.remove(0);
+        if (issue != null){
+            if (history.size() == 10) {
+                history.remove(0);
+            }
+            history.add(issue);
         }
-        history.add(issue);
     }
 
     @Override

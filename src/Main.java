@@ -19,8 +19,8 @@ public class Main {
     public static void main(String[] args) {
         TaskManager inMemoryTaskManager = Managers.getDefault();
         try {
-            test(inMemoryTaskManager);
-            //handMenuChoice(inMemoryTaskManager);
+            //test(inMemoryTaskManager);
+            handMenuChoice(inMemoryTaskManager);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
@@ -98,7 +98,7 @@ public class Main {
         System.out.println("\nПосле очистки:");
         taskManager.printAllIssues();
         System.out.println("\nИстория просмотров:");
-        printHistory(taskManager.getHistoryManager().getHistory());
+        printHistory(taskManager.getHistory());
     }
 
     private static void handMenuChoice(TaskManager taskManager) {
@@ -116,7 +116,7 @@ public class Main {
                     case 5 -> taskManager.printIssues(chooseIssueType());
                     case 6 -> taskManager.printAllIssues();
                     case 7 -> taskManager.clearIssuesList(chooseIssueType());
-                    case 8 -> printHistory(taskManager.getHistoryManager().getHistory());
+                    case 8 -> printHistory(taskManager.getHistory());
                     case 9 -> {
                         System.out.println("Работа завершена");
                         return;
