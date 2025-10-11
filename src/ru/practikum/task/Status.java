@@ -1,0 +1,9 @@
+package ru.practikum.task;
+
+public enum Status {
+
+    NEW,
+    IN_PROGRESS,
+    DONE
+
+}
