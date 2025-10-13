@@ -12,6 +12,12 @@ public class Epic extends Task {
         this.subtasks = new ArrayList<>();
     }
 
+    public Epic(String taskString) {
+        super(taskString);
+        String[] parts = taskString.substring(taskString.indexOf("{") + 1, taskString.indexOf("}")).split(", ");
+        this.subtasks = new ArrayList<>();
+    }
+
     public List<Integer> getSubtasks() {
         return subtasks;
     }

@@ -1,0 +1,8 @@
+Epic{subtaskIds=[1, 2], id='1', summary='epic1', description='epic1_desc', status=NEW}
+Epic{subtaskIds=[3, 4], id='2', summary='epic2', description='epic2_desc', status=NEW}
+Subtask{parentEpicId='1', id='1', summary='subtask1', description='subtask1_desc', status=NEW}
+Subtask{parentEpicId='1', id='2', summary='subtask2', description='subtask2_desc', status=NEW}
+Subtask{parentEpicId='2', id='3', summary='subtask3', description='subtask3_desc', status=NEW}
+Subtask{parentEpicId='2', id='4', summary='subtask4', description='subtask4_desc', status=NEW}
+Task{id='1', summary='task1', description='task1_desc', status=NEW}
+Task{id='2', summary='task2', description='task2_desc', status=NEW}

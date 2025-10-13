@@ -21,6 +21,37 @@ public class Task {
         this.status = status;
     }
 
+    public Task(String taskString) {
+        String[] parts = taskString.substring(taskString.indexOf("{") + 1, taskString.indexOf("}")).split(", ");
+        this.id = 0;
+        this.summary = "";
+        this.description = "";
+        this.status = Status.NEW;
+
+        for (String part : parts) {
+            String[] keyValue = part.split("=");
+            if (keyValue.length == 2) {
+                String key = keyValue[0].trim().replaceAll("'", "");
+                String value = keyValue[1].trim().replaceAll("'", "");
+
+                switch (key) {
+                    case "id":
+                        this.id = Integer.parseInt(value);
+                        break;
+                    case "summary":
+                        this.summary = value;
+                        break;
+                    case "description":
+                        this.description = value;
+                        break;
+                    case "status":
+                        this.status = Status.valueOf(value);
+                        break;
+                }
+            }
+        }
+    }
+
     public int getId() {
         return id;
     }

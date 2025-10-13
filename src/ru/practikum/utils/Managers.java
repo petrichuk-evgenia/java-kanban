@@ -1,9 +1,8 @@
 package ru.practikum.utils;
 
-import ru.practikum.manager.HistoryManager;
-import ru.practikum.manager.InMemoryHistoryManager;
-import ru.practikum.manager.InMemoryTaskManager;
-import ru.practikum.manager.TaskManager;
+import ru.practikum.manager.*;
+
+import static ru.practikum.manager.FileBackedTaskManager.TASKS_FILE_NAME;
 
 public class Managers {
 
@@ -15,4 +14,7 @@ public class Managers {
         return new InMemoryHistoryManager();
     }
 
+    public static TaskManager getFileBackedTaskManager() {
+        return new FileBackedTaskManager(TASKS_FILE_NAME);
+    }
 }
