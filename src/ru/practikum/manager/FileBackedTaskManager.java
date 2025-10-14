@@ -19,7 +19,7 @@ public class FileBackedTaskManager implements TaskManager {
     /**
      * Имя файла, в котором хранятся задачи.
      */
-    public static final String TASKS_FILE_NAME = "tasksList.txt";
+    private String tasksFileName;
 
     /**
      * Экземпляр менеджера задач, используемый для хранения данных в памяти.
@@ -36,6 +36,7 @@ public class FileBackedTaskManager implements TaskManager {
      */
     public FileBackedTaskManager(String fileName) {
         manager = new InMemoryTaskManager();
+        tasksFileName = fileName;
         try {
             loadFromFile(new File(fileName));
         } catch (ManagerSaveException e) {
@@ -112,7 +113,7 @@ public class FileBackedTaskManager implements TaskManager {
     public <T extends Task> int addIssue(T issue) {
         int id = manager.addIssue(issue);
         try {
-            save(TASKS_FILE_NAME);
+            save(tasksFileName);
         } catch (ManagerSaveException e) {
             System.out.println(e.getMessage());
         }
@@ -130,7 +131,7 @@ public class FileBackedTaskManager implements TaskManager {
     public <T extends Task> T updateIssue(int id, T issue) {
         T updatedIssue = manager.updateIssue(id, issue);
         try {
-            save(TASKS_FILE_NAME);
+            save(tasksFileName);
         } catch (ManagerSaveException e) {
             System.out.println(e.getMessage());
         }
@@ -158,7 +159,7 @@ public class FileBackedTaskManager implements TaskManager {
     public void clearIssuesList(String issueType) {
         manager.clearIssuesList(issueType);
         try {
-            save(TASKS_FILE_NAME);
+            save(tasksFileName);
         } catch (ManagerSaveException e) {
             System.out.println(e.getMessage());
         }
@@ -191,7 +192,7 @@ public class FileBackedTaskManager implements TaskManager {
      */
     @Override
     public void printAllIssues() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(TASKS_FILE_NAME))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(tasksFileName))) {
             while (reader.ready()) {
                 System.out.println(reader.readLine());
             }
@@ -210,7 +211,7 @@ public class FileBackedTaskManager implements TaskManager {
     public void removeIssueById(int id, String issueType) {
         manager.removeIssueById(id, issueType);
         try {
-            save(TASKS_FILE_NAME);
+            save(tasksFileName);
         } catch (ManagerSaveException e) {
             System.out.println(e.getMessage());
         }
@@ -234,5 +235,9 @@ public class FileBackedTaskManager implements TaskManager {
     @Override
     public Map<String, List<Object>> getTasksList() {
         return manager.getTasksList();
+    }
+
+    public String getTasksFileName() {
+        return tasksFileName;
     }
 }

@@ -2,8 +2,6 @@ package ru.practikum.utils;
 
 import ru.practikum.manager.*;
 
-import static ru.practikum.manager.FileBackedTaskManager.TASKS_FILE_NAME;
-
 public class Managers {
 
     public static TaskManager getDefault() {
@@ -15,6 +13,6 @@ public class Managers {
     }
 
     public static TaskManager getFileBackedTaskManager() {
-        return new FileBackedTaskManager(TASKS_FILE_NAME);
+        return new FileBackedTaskManager("tasksList.txt");
     }
 }
