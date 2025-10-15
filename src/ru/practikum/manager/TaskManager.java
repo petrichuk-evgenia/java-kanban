@@ -23,4 +23,6 @@ public interface TaskManager {
     void removeIssueById(int id, String issueType);
 
     <T extends Task> Map<String, T> getHistory();
+
+    Map<String, List<Object>> getTasksList();
 }

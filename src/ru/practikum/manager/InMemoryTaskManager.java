@@ -259,7 +259,6 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager {
                 case "Subtask" -> printIssue((Subtask) issue);
                 case "Epic" -> printIssue((Epic) issue);
             }
-
         }
     }
 
@@ -330,5 +329,9 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager {
     private int incEpicIdCounter() {
         this.epicIdCounter++;
         return this.epicIdCounter;
+    }
+
+    public Map<String, List<Object>> getTasksList() {
+        return tasksList;
     }
 }

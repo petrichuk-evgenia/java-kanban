@@ -18,9 +18,11 @@ public class Main {
 
     public static void main(String[] args) {
         TaskManager inMemoryTaskManager = Managers.getDefault();
+        TaskManager fileTaskManager = Managers.getFileBackedTaskManager();
         try {
-            test(inMemoryTaskManager);
-            testHistory(inMemoryTaskManager);
+            test(fileTaskManager);
+            //test(inMemoryTaskManager);
+            //testHistory(inMemoryTaskManager);
             //handMenuChoice(inMemoryTaskManager);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
@@ -73,7 +75,6 @@ public class Main {
         System.out.println(taskManager.getIssueById(s3Id, "Subtask").toString());
         System.out.println(taskManager.getIssueById(s4Id, "Subtask").toString());
         System.out.println("\nУдаление:" + String.format(" Task %d, Subtask %d, Epic %d", t2Id, s1Id, e2Id));
-        ;
         taskManager.removeIssueById(t2Id, "Task");
         taskManager.removeIssueById(s1Id, "Subtask");
         taskManager.removeIssueById(e2Id, "Epic");

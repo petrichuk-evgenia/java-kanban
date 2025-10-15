@@ -3,28 +3,34 @@ package test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.practikum.manager.TaskManager;
+import ru.practikum.exceptions.ManagerSaveException;
+import ru.practikum.manager.FileBackedTaskManager;
 import ru.practikum.task.Epic;
 import ru.practikum.task.Status;
 import ru.practikum.task.Subtask;
 import ru.practikum.task.Task;
-import ru.practikum.utils.Managers;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("Тестирование InMemoryTaskManager")
-public class BasicTests {
+@DisplayName("Тестирование FileBackedTaskManager")
+public class FileBackedTaskManagerTest{
 
-    TaskManager taskManager = Managers.getDefault();
+    private static final String testFileName = "test/resources/test_tasks.txt";
+    private FileBackedTaskManager taskManager = new FileBackedTaskManager("tasksList.txt");
 
     @AfterEach
     public void clearIssues() {
         taskManager.clearIssuesList("Task");
         taskManager.clearIssuesList("Epic");
         taskManager.clearIssuesList("Subtask");
+        checkFiles();
     }
 
     @Test
@@ -33,6 +39,7 @@ public class BasicTests {
         int t1Id = taskManager.addIssue(new Task("task1", "task1_desc"));
         task.setId(t1Id);
         assertTrue(taskManager.getIssueById(t1Id, "Task").equals(task));
+        checkFiles();
     }
 
     @Test
@@ -51,6 +58,7 @@ public class BasicTests {
         assertTrue(Epic.class.cast(taskManager.getIssueById(e1Id, "Epic")).equals(epic));
         assertTrue(Subtask.class.cast(taskManager.getIssueById(s1Id, "Subtask")).equals(subtask1));
         assertTrue(Subtask.class.cast(taskManager.getIssueById(s2Id, "Subtask")).equals(subtask2));
+        checkFiles();
     }
 
     @Test
@@ -63,6 +71,7 @@ public class BasicTests {
         taskManager.updateIssue(t1Id, taskToUpdate);
         taskToUpdate.setId(t1Id);
         assertTrue(taskManager.getIssueById(t1Id, "Task").equals(taskToUpdate));
+        checkFiles();
     }
 
     @Test
@@ -93,6 +102,7 @@ public class BasicTests {
                 updatedEpic.getStatus().equals(Status.DONE)
         );
         assertEquals(taskManager.getIssueById(e1Id, "Epic").getStatus(), Status.IN_PROGRESS);
+        checkFiles();
 
     }
 
@@ -122,11 +132,51 @@ public class BasicTests {
                 }
             });
         });
+        checkFiles();
     }
 
     private <T extends Task> void checkRemoverIssueExists(List<T> issues, int removeId) {
         for (T issue : issues) {
             assertTrue(issue.getId() != removeId);
+        }
+    }
+
+    @Test
+    public void checkFilesForLoadFromFile() {
+        int t1Id = taskManager.addIssue(new Task("task1", "task1_desc"));
+        int t2Id = taskManager.addIssue(new Task("task2", "task2_desc"));
+        int e1Id = taskManager.addIssue(new Epic("epic1", "epic1_desc"));
+        int e2Id = taskManager.addIssue(new Epic("epic2", "epic2_desc"));
+        int s1Id = taskManager.addIssue(new Subtask("subtask1", "subtask1_desc", taskManager.getIssueById(e1Id, "Epic").getId()));
+        int s2Id = taskManager.addIssue(new Subtask("subtask2", "subtask2_desc", taskManager.getIssueById(e1Id, "Epic").getId()));
+        int s3Id = taskManager.addIssue(new Subtask("subtask3", "subtask3_desc", taskManager.getIssueById(e2Id, "Epic").getId()));
+        int s4Id = taskManager.addIssue(new Subtask("subtask4", "subtask4_desc", taskManager.getIssueById(e2Id, "Epic").getId()));
+        try(BufferedReader reader1 = new BufferedReader(new FileReader(taskManager.getTasksFileName())); BufferedReader reader2 = new BufferedReader(new FileReader(testFileName));){
+            while (reader1.ready() && reader2.ready()) {
+                assertTrue(reader1.readLine().equals(reader2.readLine()), "Файлы не совпадают");
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void checkFiles(){
+        String fileName = "test/resources/tmp.txt";
+        try {
+            taskManager.save(fileName);
+        } catch (ManagerSaveException e) {
+            throw new RuntimeException(e);
+        }
+        try(BufferedReader reader1 = new BufferedReader(new FileReader(taskManager.getTasksFileName())); BufferedReader reader2 = new BufferedReader(new FileReader(fileName));){
+            while (reader1.ready() && reader2.ready()) {
+                assertTrue(reader1.readLine().equals(reader2.readLine()), "Файлы не совпадают");
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }
