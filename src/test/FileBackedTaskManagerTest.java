@@ -20,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Тестирование FileBackedTaskManager")
-public class FileBackedTaskManagerTest{
+public class FileBackedTaskManagerTest {
 
-    private static final String testFileName = "test/resources/test_tasks.txt";
+    private static final String testFileName = "src/test/resources/test_tasks.txt";
     private FileBackedTaskManager taskManager = new FileBackedTaskManager("tasksList.txt");
 
     @AfterEach
@@ -151,7 +151,7 @@ public class FileBackedTaskManagerTest{
         int s2Id = taskManager.addIssue(new Subtask("subtask2", "subtask2_desc", taskManager.getIssueById(e1Id, "Epic").getId()));
         int s3Id = taskManager.addIssue(new Subtask("subtask3", "subtask3_desc", taskManager.getIssueById(e2Id, "Epic").getId()));
         int s4Id = taskManager.addIssue(new Subtask("subtask4", "subtask4_desc", taskManager.getIssueById(e2Id, "Epic").getId()));
-        try(BufferedReader reader1 = new BufferedReader(new FileReader(taskManager.getTasksFileName())); BufferedReader reader2 = new BufferedReader(new FileReader(testFileName));){
+        try (BufferedReader reader1 = new BufferedReader(new FileReader(taskManager.getTasksFileName())); BufferedReader reader2 = new BufferedReader(new FileReader(testFileName));) {
             while (reader1.ready() && reader2.ready()) {
                 assertTrue(reader1.readLine().equals(reader2.readLine()), "Файлы не совпадают");
             }
@@ -162,14 +162,14 @@ public class FileBackedTaskManagerTest{
         }
     }
 
-    private void checkFiles(){
-        String fileName = "test/resources/tmp.txt";
+    private void checkFiles() {
+        String fileName = "src/test/resources/tmp.txt";
         try {
             taskManager.save(fileName);
         } catch (ManagerSaveException e) {
             throw new RuntimeException(e);
         }
-        try(BufferedReader reader1 = new BufferedReader(new FileReader(taskManager.getTasksFileName())); BufferedReader reader2 = new BufferedReader(new FileReader(fileName));){
+        try (BufferedReader reader1 = new BufferedReader(new FileReader(taskManager.getTasksFileName())); BufferedReader reader2 = new BufferedReader(new FileReader(fileName));) {
             while (reader1.ready() && reader2.ready()) {
                 assertTrue(reader1.readLine().equals(reader2.readLine()), "Файлы не совпадают");
             }

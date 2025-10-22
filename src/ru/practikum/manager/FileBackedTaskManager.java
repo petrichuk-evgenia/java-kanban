@@ -17,14 +17,13 @@ import java.util.Map;
 public class FileBackedTaskManager implements TaskManager {
 
     /**
-     * Имя файла, в котором хранятся задачи.
-     */
-    private String tasksFileName;
-
-    /**
      * Экземпляр менеджера задач, используемый для хранения данных в памяти.
      */
     private static TaskManager manager;
+    /**
+     * Имя файла, в котором хранятся задачи.
+     */
+    private String tasksFileName;
 
     /**
      * Конструктор класса FileBackedTaskManager.
