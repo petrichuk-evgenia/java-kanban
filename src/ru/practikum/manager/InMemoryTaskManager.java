@@ -69,8 +69,27 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager {
     }
 
     private <T extends Task> void updateId(T issue, int id) {
-        if (issue.getId() == 0) {
+        int idFromIssue = issue.getId();
+        if (idFromIssue == 0) {
             issue.setId(id);
+        }else{
+            switch (issue.getClass().getSimpleName()) {
+                case "Task" -> {
+                    if(idFromIssue > taskIdCounter){
+                        taskIdCounter = idFromIssue;
+                    }
+                }
+                case "Subtask" -> {
+                    if(idFromIssue > subtaskIdCounter){
+                        subtaskIdCounter = idFromIssue;
+                    }
+                }
+                case "Epic" -> {
+                    if(idFromIssue > epicIdCounter){
+                        epicIdCounter = idFromIssue;
+                    }
+                }
+            }
         }
     }
 
