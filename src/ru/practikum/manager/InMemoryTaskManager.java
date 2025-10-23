@@ -72,20 +72,20 @@ public class InMemoryTaskManager<T extends Task> implements TaskManager {
         int idFromIssue = issue.getId();
         if (idFromIssue == 0) {
             issue.setId(id);
-        }else{
+        } else {
             switch (issue.getClass().getSimpleName()) {
                 case "Task" -> {
-                    if(idFromIssue > taskIdCounter){
+                    if (idFromIssue > taskIdCounter) {
                         taskIdCounter = idFromIssue;
                     }
                 }
                 case "Subtask" -> {
-                    if(idFromIssue > subtaskIdCounter){
+                    if (idFromIssue > subtaskIdCounter) {
                         subtaskIdCounter = idFromIssue;
                     }
                 }
                 case "Epic" -> {
-                    if(idFromIssue > epicIdCounter){
+                    if (idFromIssue > epicIdCounter) {
                         epicIdCounter = idFromIssue;
                     }
                 }

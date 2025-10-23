@@ -14,6 +14,22 @@ public class Subtask extends Task {
     }
 
 
+    public Subtask(String taskString) {
+        super(taskString);
+        String[] parts = taskString.substring(taskString.indexOf("{") + 1, taskString.indexOf("}")).split(", ");
+
+        for (String part : parts) {
+            String[] keyValue = part.split("=");
+            if (keyValue.length == 2) {
+                String key = keyValue[0].trim().trim().replaceAll("'", "");
+                String value = keyValue[1].trim().trim().replaceAll("'", "");
+                if (key.equals("parentEpicId")) {
+                    this.epicId = Integer.parseInt(value);
+                }
+            }
+        }
+    }
+
     public int getEpicId() {
         return epicId;
     }
@@ -36,22 +52,6 @@ public class Subtask extends Task {
         if (!super.equals(o)) return false;
         Subtask subtask = (Subtask) o;
         return epicId == subtask.epicId;
-    }
-
-    public Subtask(String taskString) {
-        super(taskString);
-        String[] parts = taskString.substring(taskString.indexOf("{") + 1, taskString.indexOf("}")).split(", ");
-
-        for (String part : parts) {
-            String[] keyValue = part.split("=");
-            if (keyValue.length == 2) {
-                String key = keyValue[0].trim().trim().replaceAll("'", "");
-                String value = keyValue[1].trim().trim().replaceAll("'", "");
-                if (key.equals("parentEpicId")) {
-                    this.epicId = Integer.parseInt(value);
-                }
-            }
-        }
     }
 
 }
